@@ -735,6 +735,12 @@ async fn send_with_selected_transport(email: Message) -> EmptyResult {
 }
 
 async fn send_email(address: &str, subject: &str, body_html: String, body_text: String) -> EmptyResult {
+    // Accounts may use plain usernames instead of email addresses; there is nowhere to deliver mail for those.
+    if !crate::util::is_valid_email(address) {
+        warn!("Not sending email '{subject}' to '{}': not a valid email address", address.escape_debug());
+        return Ok(());
+    }
+
     let smtp_from = Address::from_str(&CONFIG.smtp_from())?;
 
     let body = if CONFIG.smtp_embed_images() {

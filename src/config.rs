@@ -1067,9 +1067,9 @@ fn validate_config(cfg: &ConfigItems, on_update: bool) -> Result<(), Error> {
 
     let org_creation_users = cfg.org_creation_users.trim().to_lowercase();
     if !(org_creation_users.is_empty() || org_creation_users == "all" || org_creation_users == "none")
-        && org_creation_users.split(',').any(|u| !u.contains('@'))
+        && org_creation_users.split(',').any(|u| u.trim().is_empty())
     {
-        err!("`ORG_CREATION_USERS` contains invalid email addresses");
+        err!("`ORG_CREATION_USERS` contains empty tokens");
     }
 
     if let Some(ref token) = cfg.admin_token

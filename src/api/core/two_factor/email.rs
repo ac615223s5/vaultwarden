@@ -398,10 +398,10 @@ pub async fn activate_email_2fa(user: &User, conn: &DbConn) -> EmptyResult {
 
 /// Takes an email address and obscures it by replacing it with asterisks except two characters.
 pub fn obscure_email(email: &str) -> String {
-    let split: Vec<&str> = email.rsplitn(2, '@').collect();
-
-    let mut name = split[1].to_owned();
-    let domain = &split[0];
+    let (mut name, domain) = match email.rsplit_once('@') {
+        Some((name, domain)) => (name.to_owned(), domain),
+        None => (email.to_owned(), ""),
+    };
 
     let name_size = name.chars().count();
 
@@ -413,7 +413,11 @@ pub fn obscure_email(email: &str) -> String {
         format!("{name}{stars}")
     };
 
-    format!("{new_name}@{domain}")
+    if domain.is_empty() {
+        new_name
+    } else {
+        format!("{new_name}@{domain}")
+    }
 }
 
 pub async fn find_and_activate_email_2fa(user_id: &UserId, conn: &DbConn) -> EmptyResult {

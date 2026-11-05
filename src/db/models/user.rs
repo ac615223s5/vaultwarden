@@ -334,8 +334,8 @@ impl User {
     }
 
     pub async fn save(&mut self, conn: &DbConn) -> EmptyResult {
-        if !crate::util::is_valid_email(&self.email) {
-            err!(format!("User email {} is not a valid email address", self.email.escape_debug()))
+        if self.email.trim().is_empty() {
+            err!("User email/username can't be empty")
         }
 
         self.updated_at = Utc::now().naive_utc();
@@ -483,8 +483,8 @@ impl Invitation {
     }
 
     pub async fn save(&self, conn: &DbConn) -> EmptyResult {
-        if !crate::util::is_valid_email(&self.email) {
-            err!(format!("Invitation email {} is not a valid email address", self.email.escape_debug()))
+        if self.email.trim().is_empty() {
+            err!("Invitation email/username can't be empty")
         }
 
         db_run! { conn:
